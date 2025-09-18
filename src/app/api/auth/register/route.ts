@@ -79,11 +79,15 @@ export const POST = async (req: NextRequest) => {
     });
 
     return response;
-  } catch (error: any) {
-    console.error("Register Error:", error);
-    return NextResponse.json(
-      new ApiError(500, error.message || "Internal server error"),
-      { status: 500 }
-    );
-  }
+  } catch (error: unknown) {
+  console.error("Register Error:", error);
+
+  const apiError =
+    error instanceof Error
+      ? new ApiError(500, error.message || "Internal server error")
+      : new ApiError(500, "Internal server error");
+
+  return NextResponse.json(apiError, { status: 500 });
+}
+
 };

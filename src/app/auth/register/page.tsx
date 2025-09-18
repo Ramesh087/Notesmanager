@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { useAuth } from "@/context/AuthContext";
 
 type RegisterFormInputs = {
@@ -76,9 +76,15 @@ export default function SignupPage() {
         try { await axios.post("/api/auth/refresh", {}, { withCredentials: true }); } catch {}
         router.push("/");
       }
-    } catch (err: any) {
-      setError(err.response?.data?.message || "Registration failed. Please try again.");
-    } finally {
+    } catch (err: unknown) {
+  if (err instanceof AxiosError) {
+    setError(err.response?.data?.message || "Registration failed. Please try again.");
+  } else if (err instanceof Error) {
+    setError(err.message);
+  } else {
+    setError("Registration failed. Please try again.");
+  }
+}finally {
       setLoading(false);
     }
   };
