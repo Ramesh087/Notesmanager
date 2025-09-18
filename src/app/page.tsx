@@ -1,103 +1,110 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import { useEffect, useState } from "react";
+import axios from "axios";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
+
+type Note = {
+  _id: string;
+  title: string;
+  description: string;
+  createdAt: string;
+};
+
+export default function NotesPage() {
+  const router = useRouter();
+  const { isLoggedIn, isAdmin } = useAuth();
+  const [notes, setNotes] = useState<Note[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [authResolved, setAuthResolved] = useState(false); 
+
+
+  useEffect(() => {
+    if (isLoggedIn === false) {
+      router.replace("/auth/login");
+    } else if (isLoggedIn === true) {
+      setAuthResolved(true);
+    }
+  }, [isLoggedIn, router]);
+
+ 
+  useEffect(() => {
+    if (!authResolved) return;
+
+    const fetchNotes = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const res = await axios.get("/api/notes", { withCredentials: true });
+        const list = res.data?.data?.notes ?? res.data?.notes ?? [];
+        setNotes(list);
+      } catch (err: any) {
+        setError(err.response?.data?.message || "Failed to fetch notes");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchNotes();
+  }, [authResolved]);
+
+  if (!authResolved) return null; 
+
+  const handleDelete = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this note?")) return;
+    try {
+      await axios.delete(`/api/notes/${id}`, { withCredentials: true });
+      setNotes(notes.filter((note) => note._id !== id));
+    } catch (err: any) {
+      setError(err.response?.data?.message || "Failed to delete note");
+    }
+  };
+
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+    <div className="p-4 flex-1">
+      <div className="flex justify-between items-center mb-4">
+        <h1 className="text-2xl font-bold text-white">Your Notes</h1>
+        <button
+          className="px-4 py-2 bg-red-600 rounded-md text-white hover:bg-red-700"
+          onClick={() => router.push("/notes/form")}
+        >
+          Create New Note
+        </button>
+      </div>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+      {loading && <p className="text-white">Loading...</p>}
+      {error && <p className="text-red-500">{error}</p>}
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {notes.map((note) => (
+          <div key={note._id} className="bg-gray-800 p-4 rounded-md shadow-md">
+            <h2 className="text-lg font-semibold text-white">{note.title}</h2>
+            <p className="text-gray-300 mt-2">{note.description}</p>
+            <div className="flex justify-end gap-2 mt-4">
+              {!isAdmin && (
+                <button
+                  className="px-2 py-1 bg-yellow-500 rounded-md text-black hover:bg-yellow-600"
+                  onClick={() => router.push(`/notes/form?id=${note._id}`)}
+                >
+                  Edit
+                </button>
+              )}
+              <button
+                className="px-2 py-1 bg-red-600 rounded-md text-white hover:bg-red-700"
+                onClick={() => handleDelete(note._id)}
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {notes.length === 0 && !loading && (
+        <p className="text-gray-400 mt-4">No notes found. Create your first note!</p>
+      )}
     </div>
   );
 }
