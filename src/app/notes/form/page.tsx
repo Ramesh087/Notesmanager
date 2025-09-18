@@ -3,7 +3,7 @@
 import { useForm } from "react-hook-form";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { useAuth } from "@/context/AuthContext";
 
 type NoteFormInputs = {
@@ -38,9 +38,16 @@ export default function NoteFormPage() {
         setValue("title", note.title);
         setValue("description", note.description);
         if (note.isPublished !== undefined) setValue("isPublished", note.isPublished);
-      } catch (err: any) {
-        setError(err.response?.data?.message || "Failed to load note");
-      } finally {
+      } catch (err: unknown) {
+  if (err && typeof err === "object" && "response" in err) {
+    const axiosErr = err as { response?: { data?: { message?: string } } };
+    setError(axiosErr.response?.data?.message || "Failed to load note");
+  } else if (err instanceof Error) {
+    setError(err.message);
+  } else {
+    setError("Failed to load note");
+  }
+} finally {
         setFetching(false);
       }
     };
@@ -60,15 +67,21 @@ export default function NoteFormPage() {
         await axios.post("/api/notes", data, { withCredentials: true });
       }
       router.push("/");
-    } catch (err: any) {
-      if (err.response?.status === 401) {
-    router.push("/auth/login");
-  } else {
-    setError(err.response?.data?.message || "Failed to load note");
-  }
-    } finally {
-      setLoading(false);
+    } catch (err: unknown) {
+  if (err instanceof AxiosError) {
+    if (err.response?.status === 401) {
+      router.push("/auth/login");
+    } else {
+      setError(err.response?.data?.message || "Failed to load note");
     }
+  } else if (err instanceof Error) {
+    setError(err.message);
+  } else {
+    setError("Failed to load note");
+  }
+} finally {
+  setLoading(false);
+}
   };
 
   if (fetching) return <p className="text-white p-4">Loading note...</p>;

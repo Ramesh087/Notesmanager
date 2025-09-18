@@ -47,12 +47,18 @@ export async function GET(req: NextRequest) {
     return NextResponse.json(
       new ApiResponse(200, { total, page, limit, notes }, "Notes fetched successfully")
     );
-  } catch (error: any) {
-    const apiError = new ApiError(500, error.message || "Server Error");
-    return NextResponse.json(new ApiResponse(apiError.statusCode, null, apiError.message), {
-      status: apiError.statusCode,
-    });
-  }
+  } catch (error: unknown) {
+  const apiError =
+    error instanceof Error
+      ? new ApiError(500, error.message || "Server Error")
+      : new ApiError(500, "Server Error");
+
+  return NextResponse.json(
+    new ApiResponse(apiError.statusCode, null, apiError.message),
+    { status: apiError.statusCode }
+  );
+}
+
 }
 
 
@@ -89,10 +95,16 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(new ApiResponse(201, note, "Note created successfully"), {
       status: 201,
     });
-  } catch (error: any) {
-    const apiError = error instanceof ApiError ? error : new ApiError(500, error.message || "Server Error");
-    return NextResponse.json(new ApiResponse(apiError.statusCode, null, apiError.message), {
-      status: apiError.statusCode,
-    });
-  }
+  } catch (error: unknown) {
+  const apiError =
+    error instanceof Error
+      ? new ApiError(500, error.message || "Server Error")
+      : new ApiError(500, "Server Error");
+
+  return NextResponse.json(
+    new ApiResponse(apiError.statusCode, null, apiError.message),
+    { status: apiError.statusCode }
+  );
+}
+
 }

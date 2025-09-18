@@ -40,10 +40,22 @@ export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string 
     }
 
     return NextResponse.json(new ApiResponse(200, note, "Note fetched successfully"));
-  } catch (error: any) {
-    const apiError = error instanceof ApiError ? error : new ApiError(500, error.message || "Server Error");
-    return NextResponse.json(new ApiResponse(apiError.statusCode, null, apiError.message), { status: apiError.statusCode });
+  } catch (error: unknown) {
+  let apiError: ApiError;
+
+  if (error instanceof ApiError) {
+    apiError = error;
+  } else if (error instanceof Error) {
+    apiError = new ApiError(500, error.message || "Server Error");
+  } else {
+    apiError = new ApiError(500, "Server Error");
   }
+
+  return NextResponse.json(
+    new ApiResponse(apiError.statusCode, null, apiError.message),
+    { status: apiError.statusCode }
+  );
+}
 }
 
 
@@ -91,10 +103,23 @@ export async function PUT(req: NextRequest, ctx: { params: Promise<{ id: string 
     await note.save();
 
     return NextResponse.json(new ApiResponse(200, note, "Note updated successfully"));
-  } catch (error: any) {
-    const apiError = error instanceof ApiError ? error : new ApiError(500, error.message || "Server Error");
-    return NextResponse.json(new ApiResponse(apiError.statusCode, null, apiError.message), { status: apiError.statusCode });
+  } catch (error: unknown) {
+  let apiError: ApiError;
+
+  if (error instanceof ApiError) {
+    apiError = error;
+  } else if (error instanceof Error) {
+    apiError = new ApiError(500, error.message || "Server Error");
+  } else {
+    apiError = new ApiError(500, "Server Error");
   }
+
+  return NextResponse.json(
+    new ApiResponse(apiError.statusCode, null, apiError.message),
+    { status: apiError.statusCode }
+  );
+}
+
 }
 
 
@@ -135,8 +160,21 @@ export async function DELETE(req: NextRequest, ctx: { params: Promise<{ id: stri
     await Note.findByIdAndDelete(noteId);
 
     return NextResponse.json(new ApiResponse(200, null, "Note deleted successfully"));
-  } catch (error: any) {
-    const apiError = error instanceof ApiError ? error : new ApiError(500, error.message || "Server Error");
-    return NextResponse.json(new ApiResponse(apiError.statusCode, null, apiError.message), { status: apiError.statusCode });
+  }catch (error: unknown) {
+  let apiError: ApiError;
+
+  if (error instanceof ApiError) {
+    apiError = error;
+  } else if (error instanceof Error) {
+    apiError = new ApiError(500, error.message || "Server Error");
+  } else {
+    apiError = new ApiError(500, "Server Error");
   }
+
+  return NextResponse.json(
+    new ApiResponse(apiError.statusCode, null, apiError.message),
+    { status: apiError.statusCode }
+  );
+}
+
 }

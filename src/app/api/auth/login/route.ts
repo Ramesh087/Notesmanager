@@ -91,10 +91,10 @@ export const POST = async (req: NextRequest) => {
     });
 
     return response;
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Login Error:", error);
     return NextResponse.json(
-      new ApiError(500, error.message || "Internal server error"),
+      new ApiError(500,  error instanceof Error ? error.message : "Internal server error"),
       { status: 500 }
     );
   }

@@ -30,16 +30,23 @@ export async function POST(req: NextRequest) {
     
     let decodedToken: RefreshTokenPayload;
     try {
-      decodedToken = jwt.verify(
-        incomingRefreshToken,
-        process.env.REFRESH_TOKEN_SECRET!
-      ) as RefreshTokenPayload;
-    } catch (err: any) {
-      return NextResponse.json(
-        new ApiError(401, "Invalid refresh token"),
-        { status: 401 }
-      );
-    }
+  decodedToken = jwt.verify(
+    incomingRefreshToken,
+    process.env.REFRESH_TOKEN_SECRET!
+  ) as RefreshTokenPayload;
+} catch (err: unknown) {
+  // Optional: log error details safely
+  if (err instanceof Error) {
+    console.error("JWT verification failed:", err.message);
+  } else {
+    console.error("JWT verification failed:", err);
+  }
+
+  return NextResponse.json(
+    new ApiError(401, "Invalid refresh token"),
+    { status: 401 }
+  );
+}
 
 
     const user = await User.findById(decodedToken._id);
@@ -86,9 +93,9 @@ export async function POST(req: NextRequest) {
     });
 
     return response;
-  } catch (error: any) {
+  } catch (error: unknown) {
     return NextResponse.json(
-      new ApiError(500, error.message || "Internal server error"),
+      new ApiError(500,  error instanceof Error ? error.message : "Internal server error"),
       { status: 500 }
     );
   }
