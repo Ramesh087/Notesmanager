@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 
@@ -40,9 +40,15 @@ export default function NotesPage() {
         const res = await axios.get("/api/notes", { withCredentials: true });
         const list = res.data?.data?.notes ?? res.data?.notes ?? [];
         setNotes(list);
-      } catch (err: any) {
-        setError(err.response?.data?.message || "Failed to fetch notes");
-      } finally {
+      } catch (err: unknown) {
+  if (err instanceof AxiosError) {
+    setError(err.response?.data?.message || "Failed to fetch notes");
+  } else if (err instanceof Error) {
+    setError(err.message);
+  } else {
+    setError("Failed to fetch notes");
+  }
+}finally {
         setLoading(false);
       }
     };
@@ -57,9 +63,15 @@ export default function NotesPage() {
     try {
       await axios.delete(`/api/notes/${id}`, { withCredentials: true });
       setNotes(notes.filter((note) => note._id !== id));
-    } catch (err: any) {
-      setError(err.response?.data?.message || "Failed to delete note");
-    }
+    } catch (err: unknown) {
+  if (err instanceof AxiosError) {
+    setError(err.response?.data?.message || "Failed to delete note");
+  } else if (err instanceof Error) {
+    setError(err.message);
+  } else {
+    setError("Failed to delete note");
+  }
+}
   };
 
   return (
