@@ -2,9 +2,9 @@
 
 import { useForm } from "react-hook-form";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import axios, { AxiosError } from "axios";
-import { useAuth } from "@/context/AuthContext";
+
 
 type NoteFormInputs = {
   title: string;
@@ -15,7 +15,6 @@ type NoteFormInputs = {
 export default function NoteFormPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { isLoggedIn } = useAuth();
   const noteId = searchParams.get("id"); 
 
   const [loading, setLoading] = useState(false);
@@ -87,6 +86,7 @@ export default function NoteFormPage() {
   if (fetching) return <p className="text-white p-4">Loading note...</p>;
 
   return (
+      <Suspense fallback={<div>Loading form...</div>}>
     <div className="flex items-center justify-center min-h-screen bg-gray-900 text-white -mt-16">
       <div className="w-full max-w-md p-8 space-y-6 bg-gray-800 rounded-xl shadow-lg">
         <h2 className="text-2xl font-bold text-center">{noteId ? "Edit Note" : "Create Note"}</h2>
@@ -132,5 +132,6 @@ export default function NoteFormPage() {
         </form>
       </div>
     </div>
+    </Suspense>
   );
 }
