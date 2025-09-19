@@ -1,165 +1,109 @@
-# 📓 Notes Manager App  
+# 📝 Notes Manager App
 
-[![Next.js](https://img.shields.io/badge/Next.js-13-black?logo=next.js)](https://nextjs.org/)  
-[![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=black)](https://react.dev/)  
-[![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)  
-[![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3-38B2AC?logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)  
-[![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-47A248?logo=mongodb&logoColor=white)](https://www.mongodb.com/)  
-[![JWT](https://img.shields.io/badge/Auth-JWT-green?logo=jsonwebtokens)](https://jwt.io/)  
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)  
+A full-stack **Next.js (App Router)** application that allows users to **register, log in, and manage notes**.  
+Built with **Next.js, TypeScript, Tailwind CSS, and MongoDB**. Authentication is handled via **JWT (Access + Refresh tokens)** stored in HTTP-only cookies.  
 
 ---
 
-## 📖 Overview
-**Notes Manager App** is a full-stack application that allows users to register, log in, and manage personal notes.  
-Users can create, view, edit, and delete notes. **Admin users** have additional privileges like editing or managing all notes.  
-
-Built with **Next.js (App Router)**, **React**, **TypeScript**, **Tailwind CSS**, and **MongoDB**. Authentication is handled via **JWT tokens stored in HttpOnly cookies**.
-
----
-
-## ✨ Features
-
-### 👤 User
-- Register and login with email & password  
-- Create new notes with a title and description  
-- View a list of personal notes  
-- Edit and delete notes  
-- Update profile (username, email, avatar)  
-
-### 👨‍💼 Admin
-- Edit or delete any user’s note  
-- (Optional) Admin dashboard for managing users  
-
----
-
-## 🚀 Live Demo
-🔗 [View Demo](https://your-demo-link.com) *(replace with deployed link)*  
-
----
-
-## 🖼 Screenshots
-
-### 🏠 Dashboard
-![Notes Dashboard](./screenshots/dashboard.png)
-
-### ✍️ Create Note
-![Create Note](./screenshots/create-note.png)
-
-### 🔑 Auth Pages
-![Login Page](./screenshots/login.png)
-
-*(Put your screenshots inside `/screenshots` folder in your repo.)*
-
----
-
-## 🛠 Tech Stack
-- **Frontend:** Next.js 13+ (App Router), React, TypeScript, Tailwind CSS  
-- **Backend:** Next.js API Routes, JWT Authentication  
-- **Database:** MongoDB (Atlas or Local)  
-- **Authentication:** JWT stored in HttpOnly cookies  
+## 🚀 Features
+- User authentication (register, login, logout)
+- JWT-based auth with access & refresh tokens
+- Create, view, edit, and delete personal notes
+- Admin support (admins can manage all notes)
+- Middleware-based route protection
+- Responsive UI with TailwindCSS
 
 ---
 
 ## 📂 Project Structure
-### notes-manager/
-├─ app/ # Next.js App Router pages
-│ ├─ notes/
-│ │ ├─[id]
-│ ├─auth/
-    ├─login
-    ├─ 
-│ ├─ layout.tsx
-│ └─ page.tsx # Root page (notes list)
-├─ components/ # Reusable components (Sidebar, Navbar, NoteCard)
-├─ lib/ # Utilities (MongoDB connection, JWT helpers)
-├─ middleware.ts # JWT authentication middleware
-├─ models/ # Mongoose models (User, Note)
-├─ app/api/ # API routes for notes and auth
-├─ styles/ # Global CSS / Tailwind config
-├─ screenshots/ # Project screenshots
-├─ package.json
-└─ tsconfig.json
+```
+src/
+├── app/ # Next.js App Router pages & API routes
+│ ├── api/ # API endpoints (auth, notes)
+│ ├── auth/ # Login & register pages
+│ ├── notes/ # Notes CRUD pages
+│ └── layout.tsx # Root layout
+├── lib/ # Database & model definitions
+├── utils/ # API response & error helpers
+├── middleware.ts # Authentication middleware
+└── ...
+```
+---
+
+## ⚙️ Setup Instructions
+
+### 1️⃣ Clone the Repository
 
 
-## 🔑 Environment Variables
+```bash
+git clone https://github.com/Ramesh087/Notesmanager
+cd notes-manager-app
+```
 
-Create a `.env` file in the root:
 
-```env
-MONGODB_URI="your_mongodb_connection_string"
+### 2️⃣ Install Dependencies
+```
+npm install
+```
+##### or
+``` 
+yarn install
+```
+### 3️⃣ Setup Environment Variables
+Create a .env.local file in the project root:
+
+
+```
+MONGODB_URI="your-mongodb-connection-string"
 
 ACCESS_TOKEN_SECRET="supersecretaccesstoken"
 ACCESS_TOKEN_EXPIRY="15m"
 
 REFRESH_TOKEN_SECRET="supersecretrefreshtoken"
 REFRESH_TOKEN_EXPIRY="7d"
+```
+⚠️ Make sure to set these in Netlify dashboard under Site Settings → Build & Deploy → Environment Variables for production.
 
-## 📡 API Routes
-#🔐 Auth
+### 4️⃣ Run the App in Development
+``` 
+npm run dev 
+```
 
-POST /api/auth/register → Register user
+Visit: http://localhost:3000
 
-POST /api/auth/login → Login & set cookie
+### 5️⃣ Build for Production
+```
+npm run build
+npm start
+```
+### 🌐 Deployment on Netlify
+``` 
+Push your code to GitHub/GitLab.
 
-POST /api/auth/logout → Logout & clear cookie
+Connect repository to Netlify.
 
-GET /api/auth/me → Current logged-in user
+Add environment variables in Netlify → Site Settings → Environment Variables.
 
-📝 Notes
+Ensure you have @netlify/plugin-nextjs enabled (Netlify auto-detects Next.js projects).
 
-GET /api/notes → All notes of logged-in user
+Deploy!
+```
+### 🔒 Protected Routes
+The middleware ensures:
 
-POST /api/notes → Create new note
+✅ Public: /auth/*, /api/auth/login, /api/auth/register, /api/auth/refresh, /api/auth/me
 
-GET /api/notes/:id → Get a single note
+🔒 Protected: /, /notes/*, /api/notes/*, /api/auth/logout
 
-PUT /api/notes/:id → Update note
+### 🛠️ Tech Stack
+Frontend: Next.js (App Router), React, TypeScript, TailwindCSS
 
-DELETE /api/notes/:id → Delete note
+Backend: Next.js API routes, MongoDB, Mongoose
 
-📜 Scripts
-npm run dev     # Start development server
-npm run build   # Build production
-npm start       # Run production
+Auth: JWT (Access + Refresh Tokens in cookies)
 
-🗄 MongoDB Models
-User
-{
-  "username": "string",
-  "email": "string",
-  "password": "string",
-  "isAdmin": "boolean"
-}
+Deployment: Netlify
 
-Note
-{
-  "title": "string",
-  "description": "string",
-  "userId": "string",
-  "createdAt": "Date",
-  "updatedAt": "Date"
-}
+### 👨‍💻 Author
+Developed Ramesh
 
-## 🚀 Future Improvements
-
-✅ Search & filter functionality
-
-✅ File/image attachments
-
-✅ UI/UX improvements with animations
-
-📸 Screenshots
-
-Add screenshots in the /screenshots folder and embed them here:
-
-![Notes List](./screenshots/notes-list.png)
-![Create Note](./screenshots/create-note.png)
-
-📄 License
-
-Licensed under the MIT License.
-See LICENSE
- for details.
-
-⭐ If you like this project, don’t forget to star the repo!
