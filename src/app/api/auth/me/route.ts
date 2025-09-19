@@ -16,6 +16,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({ isLoggedIn: true, isAdmin: user.isAdmin });
   } catch (err) {
+    console.log(err);
     return NextResponse.json({ isLoggedIn: false, isAdmin: false }, { status: 401 });
   }
 }

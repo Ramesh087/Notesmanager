@@ -17,6 +17,7 @@ export const generateAccessAndRefreshTokens = async (userId: Types.ObjectId ) =>
 
     return { accessToken, refreshToken };
   } catch (error) {
+    console.log(error);
     throw new ApiError(
       500,
       "Something went wrong while generating refresh and access token"

@@ -20,7 +20,7 @@ export default function ClientLayoutWrapper({ children }: { children: React.Reac
   const hideLayout = noLayoutPages.includes(pathname);
 
   const closeSidebar = () => setSidebarOpen(false);
-  const openSidebar = () => setSidebarOpen(true);
+  // const openSidebar = () => setSidebarOpen(true);
  
 
   useEffect(() => setIsMounted(true), []);

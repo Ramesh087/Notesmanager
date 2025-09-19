@@ -40,7 +40,8 @@ export async function POST(): Promise<NextResponse> {
     });
 
     return res;
-  } catch (error:unknown) {
+  } catch (error) {
+    console.log(error);
     return NextResponse.json(
       new ApiResponse(500, null, "Internal Server Error"),
       { status: 500 }
