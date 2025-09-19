@@ -12,19 +12,6 @@ interface MyJwtPayload extends JwtPayload {
 
 export function middleware(req: NextRequest) {
   try {
-    const { pathname } = req.nextUrl;
-
-  
-    if (
-      pathname.startsWith("/api/auth") ||
-      pathname.startsWith("/auth") ||
-      pathname.startsWith("/_next") ||
-      pathname.startsWith("/favicon") ||
-      pathname.startsWith("/public")
-    ) {
-      return NextResponse.next();
-    }
-
     const token = req.cookies.get("accessToken")?.value;
 
     if (!token) {
@@ -36,7 +23,7 @@ export function middleware(req: NextRequest) {
       process.env.ACCESS_TOKEN_SECRET as string
     ) as MyJwtPayload;
 
- 
+    // Inject user info into headers for API routes
     const requestHeaders = new Headers(req.headers);
     requestHeaders.set("x-user-id", decoded._id);
     requestHeaders.set("x-user-admin", decoded.isAdmin ? "true" : "false");
@@ -55,22 +42,24 @@ export function middleware(req: NextRequest) {
 }
 
 function handleUnauthorized(req: NextRequest, error: ApiError) {
-  
+  // If it’s an API request → return JSON response
   if (req.nextUrl.pathname.startsWith("/api")) {
-    return NextResponse.json(new ApiResponse(error.statusCode, null, error.message), {
-      status: error.statusCode,
-    });
+    return NextResponse.json(
+      new ApiResponse(error.statusCode, null, error.message),
+      { status: error.statusCode }
+    );
   }
 
-
+  // Otherwise redirect to login page
   return NextResponse.redirect(new URL("/auth/login", req.url));
 }
 
+// ✅ Only protect these routes
 export const config = {
   matcher: [
-    "/api/:path*", 
-    "/", 
-    "/notes/:path*", 
-   
+    "/",                // homepage (notes listing)
+    "/notes/:path*",    // notes pages
+    "/api/notes/:path*",// notes APIs
+    "/api/auth/logout", // logout requires login
   ],
 };
