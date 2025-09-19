@@ -78,15 +78,15 @@ export const POST = async (req: NextRequest) => {
     
     response.cookies.set("accessToken", accessToken, {
       httpOnly: true,
-      secure: false,
-      sameSite: "lax",
+      secure:  process.env.NODE_ENV === "production",
+      sameSite: "lax" as const,
       path: "/",
     });
 
     response.cookies.set("refreshToken", refreshToken, {
       httpOnly: true,
-      secure: false,
-      sameSite: "lax",
+      secure:  process.env.NODE_ENV === "production",
+      sameSite: "lax" as const,
       path: "/",
     });
 

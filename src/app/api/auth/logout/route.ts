@@ -27,7 +27,7 @@ export async function POST(): Promise<NextResponse> {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       expires: new Date(0),
-      sameSite: "lax",
+      sameSite: "lax" as const,
       path: "/",
     });
 
@@ -35,7 +35,7 @@ export async function POST(): Promise<NextResponse> {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       expires: new Date(0),
-      sameSite: "lax",
+      sameSite: "lax" as const,
       path: "/",
     });
 
