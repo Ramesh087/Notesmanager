@@ -12,7 +12,7 @@ type NoteFormInputs = {
   isPublished: boolean;
 };
 
-export default function NoteFormPage() {
+ function NotesFormContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const noteId = searchParams.get("id"); 
@@ -86,7 +86,7 @@ export default function NoteFormPage() {
   if (fetching) return <p className="text-white p-4">Loading note...</p>;
 
   return (
-      <Suspense fallback={<div>Loading form...</div>}>
+      
     <div className="flex items-center justify-center min-h-screen bg-gray-900 text-white -mt-16">
       <div className="w-full max-w-md p-8 space-y-6 bg-gray-800 rounded-xl shadow-lg">
         <h2 className="text-2xl font-bold text-center">{noteId ? "Edit Note" : "Create Note"}</h2>
@@ -132,6 +132,15 @@ export default function NoteFormPage() {
         </form>
       </div>
     </div>
-    </Suspense>
+    
   );
+}
+
+
+export default function NotesFormPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <NotesFormContent />
+    </Suspense>
+  )
 }
